@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://classless.de/classless.css">
+    <title>UNZA GPA CALCULATOR</title>
+</head>
+<body>
+    <h1>UNZA GPA calculator</h1>
+    <p>This is a GPA calculator that follows computations defined by the University of Zambia.</p>
+    <p>The data used for the computations on this page were extracted from <a href="https://www.unza.zm/sites/default/files/article_files/2019-04/Guidelines%20for%20Credit%20Accumulation%2C%20Grade%20Point%20Average%20and%20Degree%20Classification_1.pdf">here</a>.</p>
+    <p>From the data you have added below, your GPA is:
+        <div id="gpaOutput"></div>
+    </p>
+    <h3>
+        Instructions
+    </h3>
+    <ul>
+        <li>Click the button <em>Add Course Grade</em> and add your course grades while indicating if a course if a half course or full course.</li>
+        <li>Click <em>Compute GPA</em> to get your GPA</li>
+    </ul>
+    <form>
+        <div id="courseInputs">
+            <select name="CourseType" class="courseType" disabled>
+                <option value="Half Course">Half Course</option>
+                <option value="Full Course">Full Course</option>
+            </select>
+            <select name="CourseGrade" class="courseGrade" disabled>
+                <option value="A+">A+</option>
+                <option value="A">A</option>
+                <option value="B+">B+</option>
+                <option value="B">B</option>
+                <option value="C+">C+</option>
+                <option value="C">C</option>
+                <option value="D+">D+</option>
+                <option value="D">D</option>
+                <option value="S">S</option>
+            </select>
+        </div>
+        <br>
+        <button id="AddCourse">Add Course Grade</button>
+        <button type="button" id="ComputeGPA">Compute GPA</button>
+    </form>
+
+    <footer>
+        <p>Disclaimer, This website was created by a private entity with Data extracted from the University of Zambia's public page.</p>
+        <p>Created By <a href="https://github.com/AaronMbuzi">Aaron Mbuzi</a></p>
+    </footer>
+    
+    <script>
+        // Constants
+        const FULL_COURSE_CREDITS = 30;
+        const HALF_COURSE_CREDITS = 15;
+
+        const GRADE_POINTS = {
+            "A+": 5.00,
+            "A": 4.00,
+            "B+": 3.50,
+            "B": 3.00,
+            "C+": 2.37,
+            "C": 1.00,
+            "D+": 0.00,
+            "D": 0.00,
+            "S": 1.00
+        };
+
+        function calculateGPA(courseInputs) {
+            var totalCredits = 0;
+            var totalCreditGradePoints = 0;
+
+            courseInputs.forEach(function(course) {
+                var courseType = course.querySelector(".courseType").value;
+                var courseGrade = course.querySelector(".courseGrade").value;
+                var credits = courseType === "Full Course" ? FULL_COURSE_CREDITS : HALF_COURSE_CREDITS;
+                var gradePoints = GRADE_POINTS[courseGrade];
+                totalCredits += credits;
+                totalCreditGradePoints += credits * gradePoints;
+            });
+
+            // Calculate GPA
+            var gpa = totalCreditGradePoints / totalCredits;
+            return gpa.toFixed(2); // Round to two decimal places
+        }
+
+
+        document.getElementById("AddCourse").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            var courseInputs = document.getElementById("courseInputs");
+            var newCourseDiv = document.createElement("div");
+
+            // Create new select elements for course type and course grade
+            var courseTypeSelect = document.createElement("select");
+            courseTypeSelect.name = "CourseType";
+            courseTypeSelect.className = "courseType";
+            var halfCourseOption = document.createElement("option");
+            halfCourseOption.value = "Half Course";
+            halfCourseOption.textContent = "Half Course";
+            var fullCourseOption = document.createElement("option");
+            fullCourseOption.value = "Full Course";
+            fullCourseOption.textContent = "Full Course";
+            courseTypeSelect.appendChild(halfCourseOption);
+            courseTypeSelect.appendChild(fullCourseOption);
+
+            var courseGradeSelect = document.createElement("select");
+            courseGradeSelect.name = "CourseGrade";
+            courseGradeSelect.className = "courseGrade";
+            var gradeOptions = Object.keys(GRADE_POINTS);
+            gradeOptions.forEach(function(grade) {
+                var option = document.createElement("option");
+                option.value = grade;
+                option.textContent = grade;
+                courseGradeSelect.appendChild(option);
+            });
+
+            // Append the new select elements to the new course div
+            newCourseDiv.appendChild(courseTypeSelect);
+            newCourseDiv.appendChild(courseGradeSelect);
+
+            // Append the new course div to the form
+            courseInputs.appendChild(newCourseDiv);
+        });
+
+        // Compute GPA button click event listener
+        document.getElementById("ComputeGPA").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            var courseDivs = document.querySelectorAll("#courseInputs > div");
+
+            // Calculate GPA
+            var gpa = calculateGPA(courseDivs);
+
+            // Display GPA
+            document.getElementById("gpaOutput").innerText = "Your GPA is: " + gpa;
+
+            // Debugging
+            var totalCredits = 0;
+            var totalCreditGradePoints = 0;
+
+            courseDivs.forEach(function(course) {
+                var courseType = course.querySelector(".courseType").value;
+                var courseGrade = course.querySelector(".courseGrade").value;
+                var credits = courseType === "Full Course" ? FULL_COURSE_CREDITS : HALF_COURSE_CREDITS;
+                var gradePoints = GRADE_POINTS[courseGrade];
+                console.log("Course Type:", courseType);
+                console.log("Course Grade:", courseGrade);
+                console.log("Credits:", credits);
+                console.log("Grade Points:", gradePoints);
+                totalCredits += credits;
+                totalCreditGradePoints += credits * gradePoints;
+            });
+
+            console.log("Total Credits:", totalCredits);
+            console.log("Total Credit Grade Points:", totalCreditGradePoints);
+        });
+    </script>
+</body>
+</html>
